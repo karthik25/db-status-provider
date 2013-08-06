@@ -1,0 +1,32 @@
+﻿@model DbStatusProvider.Objects.SetupStatus
+           
+<style type="text/css">
+    .setup-notice {
+        background-color: #fff8dc;
+        border: 3px solid #ffeb8e;
+        position: absolute;
+        padding: 10px; 
+        top: 100px;
+        left: 25%; 
+        color: black; 
+        vertical-align: middle;
+        z-index: 9999;
+        width: 50%
+    }
+</style>
+
+@if (Model != null)
+{
+    <div class="setup-notice">
+        <div>@Model.StatusCode.ToString()</div>
+        <div>@Model.Message</div>
+        <div>
+            <ul>
+                @foreach (var script in Model.ScriptsPending)
+                {
+                    <li>@script</li>
+                }
+            </ul>
+        </div>
+    </div>
+}
