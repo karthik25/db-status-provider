@@ -22,9 +22,12 @@
         <div>@Model.Message</div>
         <div>
             <ul>
-                @foreach (var script in Model.ScriptsPending)
+                @if (Model.ScriptsPending != null)
                 {
-                    <li>@script</li>
+                    foreach (var script in Model.ScriptsPending)
+                    {
+                        <li>@script</li>
+                    }
                 }
             </ul>
         </div>

@@ -41,8 +41,15 @@ namespace DbStatusProvider.Core
                     return null;
                 
                 var abstractList = schemaContext.GetScriptsInstalled();
-                var allEntries = abstractList.Select(a => new SchemaVersion { ScriptPath = a.ScriptPath, MajorVersion = a.MajorVersion, MinorVersion = a.MinorVersion, ScriptVersion = a.ScriptVersion })
-                                             .ToList();
+                var allEntries = abstractList
+                    .Select(a => new SchemaVersion
+                    {
+                        ScriptPath = a.ScriptPath, 
+                        MajorVersion = a.MajorVersion, 
+                        MinorVersion = a.MinorVersion, 
+                        ScriptVersion = a.ScriptVersion
+                    })
+                    .ToList();
                 allEntries.Sort(new SchemaVersionComparer());
 
                 var schemaInstance = allEntries.LastOrDefault();
@@ -81,6 +88,7 @@ namespace DbStatusProvider.Core
 
                 setupStatus.StatusCode = SetupStatusCode.HasUpdates;
                 setupStatus.Message = "Your instance has some updates";
+                setupStatus.FullPathsOfScripts = scriptsToBeRan;
                 setupStatus.ScriptsPending = scriptsToBeRan.Select(s => Path.GetFileName(s.ScriptPath)).ToList();
 
                 return setupStatus;
