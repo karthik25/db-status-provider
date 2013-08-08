@@ -5,6 +5,8 @@
     <version>0.1</version>
     <authors>Karthik Ananthapadmanaban</authors>
     <owners>Karthik Ananthapadmanaban</owners>
+	<licenseUrl>http://www.opensource.org/licenses/ms-pl</licenseUrl>
+    <projectUrl>http://karthik25.github.io/db-status-provider</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This package can be used to keep track of the version of a database.</description>
     <tags>asp.net mvc3 mvc4 database</tags>
