@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Db-Status-Provider : A simple extension to keep track of the state of your MVC 3/4 application's database!" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Db-Status-Provider</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/karthik25/db-status-provider">View on GitHub</a>
+
+          <h1 id="project_title">Db-Status-Provider</h1>
+          <h2 id="project_tagline">A simple extension to keep track of the state of your MVC 3/4 application's database!</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/karthik25/db-status-provider/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/karthik25/db-status-provider/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>
+<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h3>
+
+<pre><code>PACKAGE NOT PUBLISHED TO NuGet YET
+</code></pre>
+
+<p>This is a very simple extension that can be used to keep track of the state of your application's database. I use this method for my other 
+open source project sBlog.Net!</p>
+
+<h3>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h3>
+
+<p>To install DbStatusProvider, run the following command in the Package Manager Console</p>
+
+<pre><code>PM&gt; Install-Package DbStatusProvider
+</code></pre>
+
+<p>Or, see below (Usage).</p>
+
+<h3>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h3>
+
+<p>Select the ASP.Net MVC project that should contain the DbStatusProvider nuget package. Right click, select "Manage NuGet Packages...".</p>
+
+<p>Select the "Online" option in the left menu, enter "DbStatusProvider" in the search box.</p>
+
+<p>In the results select "DbStatusProvider", click on "Install". Click on "Close".</p>
+
+<p>The following changes will happen to your project.</p>
+
+<p>(1) References to "DbStatusProvider.dll" and "WebActivatorEx.dll"
+(2) DbStatusProvider.cs to App_Start folder
+(3) _DbStatus.cshtml partial view to Views\Shared folder
+(4) The following element to web.config</p>
+
+<pre><code>&lt;dbStatusUpdater contextType="" scriptsBase="" scriptsPrefix="" /&gt;
+</code></pre>
+
+<p>The first step would be to create the data context that could be used to get a list of scripts ran / add a script that was successfully ran.</p>
+
+<pre><code>namespace SampleMvcApp.Contexts
+{
+    public class SchemaContext : ISchemaContext
+    {
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList&lt;ISchemaVersion&gt; GetScriptsInstalled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddScript(ISchemaVersion schemaVersion)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
+</code></pre>
+
+<p>Lets now update the web.config file as shown below. I guess it's already evident what the first attribute is for. The 2nd attribute
+specifies the base folder for the scripts ("~/Sql") and the 3rd attribute specifies the prefix of the scripts relevant to this application, "sc"
+in this case.</p>
+
+<pre><code>&lt;dbStatusUpdater contextType="SampleMvcApp.Contexts.SchemaContext" scriptsBase="~/Sql" scriptsPrefix="sc" /&gt;
+</code></pre>
+
+<p>The next step would be to create the folder that would contain the schema change files. Say "Sql" within the root folder. Start creating the scripts
+in the format:</p>
+
+<pre><code>scXXYYZZ[.sql]
+</code></pre>
+
+<p>"sc" is the prefix defined in the web.config file. Here XX, YY, ZZ are 2 digit numbers following an order. A valid example would be "sc010001.sql", 
+where XX = 01, YY = 00 and ZZ = 01. [.sql] is the extension of the and it could pretty much be anything.</p>
+
+<p>That's it you are all set! When the application starts the extension is going to use the context defined and the folder to "see" if any scripts 
+are pending. An application variable is created to hold the results of this operation and it could be used like this.</p>
+
+<pre><code>public class HomeController : Controller
+{
+    public ActionResult Index()
+    {
+        var setupStatus = App_Start.DbStatusProvider.GetStatus();
+        return View(setupStatus);
+    }
+}
+</code></pre>
+
+<p>Now, you could use the partial provided to display the status, as shown below:</p>
+
+<pre><code>@model DbStatusProvider.Objects.SetupStatus
+
+@Html.Partial("_DbStatus", Model)
+</code></pre>
+
+<p>That's it! It's "kind of" functional now! But to finalize, you could extend the application further by providing a button, based on the setup status:</p>
+
+<pre><code>@model DbStatusProvider.Objects.SetupStatus
+
+@Html.Partial("_DbStatus", Model)
+
+@using (Html.BeginForm("Submit", "Home"))
+{
+    &lt;input type="submit" value="Finalize" /&gt;
+}
+</code></pre>
+
+<p>Then on "submit" you could run the scripts to be run and redirect them to a different page!</p>
+
+<pre><code>[HttpPost]
+public ActionResult Submit()
+{
+    var setupStatus = App_Start.DbStatusProvider.GetStatus();
+    if (setupStatus.StatusCode == SetupStatusCode.HasUpdates)
+    {
+    var scripts = setupStatus.FullPathsOfScripts;
+
+    foreach( var script in scripts)
+    {
+        // Run the scripts
+
+        // Call the data context's AddScript method to update
+    }
+
+    // Unset the application variable
+    App_Start.DbStatusProvider.ClearStatus();   
+
+    // You could also reset the status
+    // var newStatus = App_Start.DbStatusProvider.ResetStatus();
+
+    // Redirect
+    }
+    return View();
+}
+</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Db-Status-Provider maintained by <a href="https://github.com/karthik25">karthik25</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
