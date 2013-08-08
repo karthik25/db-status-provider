@@ -42,8 +42,8 @@ open source project sBlog.Net!</p>
 
 <p>To install DbStatusProvider, run the following command in the Package Manager Console</p>
 
-<pre><code>PM&gt; Install-Package DbStatusProvider
-</code></pre>
+<div class="highlight"><pre><span class="n">PM</span><span class="p">&gt;</span> <span class="n">Install-Package</span> <span class="n">DbStatusProvider</span>
+</pre></div>
 
 <p>Or, see below (Usage).</p>
 
@@ -58,44 +58,44 @@ open source project sBlog.Net!</p>
 
 <p>The following changes will happen to your project.</p>
 
-<p>(1) References to "DbStatusProvider.dll" and "WebActivatorEx.dll"
-(2) DbStatusProvider.cs to App_Start folder
-(3) _DbStatus.cshtml partial view to Views\Shared folder
-(4) The following element to web.config</p>
-
-<pre><code>&lt;dbStatusUpdater contextType="" scriptsBase="" scriptsPrefix="" /&gt;
-</code></pre>
+<ul>
+<li>References to "DbStatusProvider.dll" and "WebActivatorEx.dll"</li>
+<li>DbStatusProvider.cs to App_Start folder</li>
+<li>_DbStatus.cshtml partial view to Views\Shared folder</li>
+<li>The following element to web.config</li>
+</ul><div class="highlight"><pre><span class="nt">&lt;dbStatusUpdater</span> <span class="na">contextType=</span><span class="s">""</span> <span class="na">scriptsBase=</span><span class="s">""</span> <span class="na">scriptsPrefix=</span><span class="s">""</span> <span class="nt">/&gt;</span>
+</pre></div>
 
 <p>The first step would be to create the data context that could be used to get a list of scripts ran / add a script that was successfully ran.</p>
 
-<pre><code>namespace SampleMvcApp.Contexts
-{
-    public class SchemaContext : ISchemaContext
-    {
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+<div class="highlight"><pre><span class="k">namespace</span> <span class="nn">SampleMvcApp.Contexts</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">SchemaContext</span> <span class="p">:</span> <span class="n">ISchemaContext</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="k">void</span> <span class="nf">Dispose</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">NotImplementedException</span><span class="p">();</span>
+        <span class="p">}</span>
 
-        public IList&lt;ISchemaVersion&gt; GetScriptsInstalled()
-        {
-            throw new NotImplementedException();
-        }
+        <span class="k">public</span> <span class="n">IList</span><span class="p">&lt;</span><span class="n">ISchemaVersion</span><span class="p">&gt;</span> <span class="n">GetScriptsInstalled</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">NotImplementedException</span><span class="p">();</span>
+        <span class="p">}</span>
 
-        public void AddScript(ISchemaVersion schemaVersion)
-        {
-            throw new NotImplementedException();
-        }
-    }
-}
-</code></pre>
+        <span class="k">public</span> <span class="k">void</span> <span class="nf">AddScript</span><span class="p">(</span><span class="n">ISchemaVersion</span> <span class="n">schemaVersion</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">NotImplementedException</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 
 <p>Lets now update the web.config file as shown below. I guess it's already evident what the first attribute is for. The 2nd attribute
 specifies the base folder for the scripts ("~/Sql") and the 3rd attribute specifies the prefix of the scripts relevant to this application, "sc"
 in this case.</p>
 
-<pre><code>&lt;dbStatusUpdater contextType="SampleMvcApp.Contexts.SchemaContext" scriptsBase="~/Sql" scriptsPrefix="sc" /&gt;
-</code></pre>
+<div class="highlight"><pre><span class="nt">&lt;dbStatusUpdater</span> <span class="na">contextType=</span><span class="s">"SampleMvcApp.Contexts.SchemaContext"</span> <span class="na">scriptsBase=</span><span class="s">"~/Sql"</span> <span class="na">scriptsPrefix=</span><span class="s">"sc"</span> <span class="nt">/&gt;</span>
+</pre></div>
 
 <p>The next step would be to create the folder that would contain the schema change files. Say "Sql" within the root folder. Start creating the scripts
 in the format:</p>
@@ -109,15 +109,15 @@ where XX = 01, YY = 00 and ZZ = 01. [.sql] is the extension of the and it could 
 <p>That's it you are all set! When the application starts the extension is going to use the context defined and the folder to "see" if any scripts 
 are pending. An application variable is created to hold the results of this operation and it could be used like this.</p>
 
-<pre><code>public class HomeController : Controller
-{
-    public ActionResult Index()
-    {
-        var setupStatus = App_Start.DbStatusProvider.GetStatus();
-        return View(setupStatus);
-    }
-}
-</code></pre>
+<div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Index</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">setupStatus</span> <span class="p">=</span> <span class="n">App_Start</span><span class="p">.</span><span class="n">DbStatusProvider</span><span class="p">.</span><span class="n">GetStatus</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nf">View</span><span class="p">(</span><span class="n">setupStatus</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 
 <p>Now, you could use the partial provided to display the status, as shown below:</p>
 
@@ -140,32 +140,32 @@ are pending. An application variable is created to hold the results of this oper
 
 <p>Then on "submit" you could run the scripts to be run and redirect them to a different page!</p>
 
-<pre><code>[HttpPost]
-public ActionResult Submit()
-{
-    var setupStatus = App_Start.DbStatusProvider.GetStatus();
-    if (setupStatus.StatusCode == SetupStatusCode.HasUpdates)
-    {
-    var scripts = setupStatus.FullPathsOfScripts;
+<div class="highlight"><pre><span class="na">[HttpPost]</span>
+<span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Submit</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">var</span> <span class="n">setupStatus</span> <span class="p">=</span> <span class="n">App_Start</span><span class="p">.</span><span class="n">DbStatusProvider</span><span class="p">.</span><span class="n">GetStatus</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">setupStatus</span><span class="p">.</span><span class="n">StatusCode</span> <span class="p">==</span> <span class="n">SetupStatusCode</span><span class="p">.</span><span class="n">HasUpdates</span><span class="p">)</span>
+    <span class="p">{</span>
+    <span class="kt">var</span> <span class="n">scripts</span> <span class="p">=</span> <span class="n">setupStatus</span><span class="p">.</span><span class="n">FullPathsOfScripts</span><span class="p">;</span>
 
-    foreach( var script in scripts)
-    {
-        // Run the scripts
+    <span class="k">foreach</span><span class="p">(</span> <span class="kt">var</span> <span class="n">script</span> <span class="k">in</span> <span class="n">scripts</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Run the scripts</span>
 
-        // Call the data context's AddScript method to update
-    }
+        <span class="c1">// Call the data context's AddScript method to update</span>
+    <span class="p">}</span>
 
-    // Unset the application variable
-    App_Start.DbStatusProvider.ClearStatus();   
+    <span class="c1">// Unset the application variable</span>
+    <span class="n">App_Start</span><span class="p">.</span><span class="n">DbStatusProvider</span><span class="p">.</span><span class="n">ClearStatus</span><span class="p">();</span>   
 
-    // You could also reset the status
-    // var newStatus = App_Start.DbStatusProvider.ResetStatus();
+    <span class="c1">// You could also reset the status</span>
+    <span class="c1">// var newStatus = App_Start.DbStatusProvider.ResetStatus();</span>
 
-    // Redirect
-    }
-    return View();
-}
-</code></pre>
+    <span class="c1">// Redirect</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nf">View</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
       </section>
     </div>
 
