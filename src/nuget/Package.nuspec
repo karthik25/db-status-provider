@@ -7,7 +7,7 @@
     <owners>Karthik Ananthapadmanaban</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This package can be used to keep track of the version of a database.</description>
-    <tags>asp.net mvc webforms database</tags>
+    <tags>asp.net mvc3 mvc4 database</tags>
 	<dependencies>
 	  <dependency id="WebActivatorEx" version="2.0.2" />
 	</dependencies>

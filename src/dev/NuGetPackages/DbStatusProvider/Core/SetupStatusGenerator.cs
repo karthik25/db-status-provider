@@ -41,6 +41,9 @@ namespace DbStatusProvider.Core
                     return null;
                 
                 var abstractList = schemaContext.GetScriptsInstalled();
+
+                schemaContext.Dispose();
+
                 var allEntries = abstractList
                     .Select(a => new SchemaVersion
                     {

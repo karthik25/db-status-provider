@@ -12,13 +12,12 @@ namespace $rootnamespace$.App_Start
     {
          public static void Start()
          {
-             var setupStatusGenerator = new SetupStatusGenerator(Assembly.GetExecutingAssembly().Location);
-             HttpContext.Current.Application[InstallationStatus] = setupStatusGenerator.GetSetupStatus();
+             SetStatus();
          }
 
          public static void Stop()
          {
-             HttpContext.Current.Application[InstallationStatus] = null;
+             ClearStatus();
          }
 
          public static SetupStatus GetStatus()
@@ -26,9 +25,21 @@ namespace $rootnamespace$.App_Start
              return (SetupStatus)HttpContext.Current.Application[InstallationStatus];
          }
 
-         public static void SetStatus()
+         public static SetupStatus ResetStatus()
+         {
+             SetStatus();
+             return GetStatus();
+         }
+
+         public static void ClearStatus()
          {
              HttpContext.Current.Application[InstallationStatus] = null;
+         }
+
+         private static void SetStatus()
+         {
+             var setupStatusGenerator = new SetupStatusGenerator(Assembly.GetExecutingAssembly().Location);
+             HttpContext.Current.Application[InstallationStatus] = setupStatusGenerator.GetSetupStatus();
          }
 
          private const string InstallationStatus = "Installation_Status";
